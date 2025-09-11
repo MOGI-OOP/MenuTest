@@ -43,6 +43,7 @@ int main()
 	mainMenu.AddMenuItem("Faktoriális");
 	mainMenu.AddMenuItem("Black on White");
 	mainMenu.AddMenuItem("White on Black");
+	mainMenu.AddMenuItem("Blue on Yellow");
 	mainMenu.AddMenuItem("Kilépés", 0);
 
 	do {
@@ -53,6 +54,8 @@ int main()
 		case 2 : SetColor(0, 15);
 			break;
 		case 3: SetColor(15, 0);
+			break;
+		case 4: SetColor(1, 14);
 			break;
 		}
 
