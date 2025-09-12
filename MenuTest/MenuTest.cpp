@@ -20,6 +20,15 @@ void Factorial()
 	printf("Írjon be egy egész számot: ");
 	InputInt(&base);
 
+	int fakt = 1;
+	for (int i=1;i <= base;i++)
+	{
+		fakt = fakt * i;
+	}
+
+
+	printf("\n%d",fakt);
+
 
 	printf("\n");
 
