@@ -21,7 +21,7 @@ void Factorial()
 	InputInt(&base);
 
 
-	printf("\n");
+	printf("Kovács Gábor\n");
 
 	// Készítse el a számítást és az eredmény kiírását
 
