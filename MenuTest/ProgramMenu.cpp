@@ -216,4 +216,3 @@ int InputDouble(double* inputD)
 	*inputD = valD;
 	return nc;
 }
-int Factorial()

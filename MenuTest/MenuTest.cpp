@@ -10,23 +10,31 @@
 CProgramMenu mainMenu;
 
 
-void Factorial()
+int Factorial()
 {
-	int base;
+	int base, i;
+	unsigned long factorial;
 
 	system("cls");
 	printf("\n\nFaktoriális számítás\n\n");
 
 	printf("Írjon be egy egész számot: ");
 	InputInt(&base);
-
-
 	printf("\n");
-
-	// Készítse el a számítást és az eredmény kiírását
-
+	if (base == 0 || base == 1) {
+		printf("Bevitt adat hibás");
+		_getch();
+		return 0;
+	}
+	factorial = base;
+	for (i = base - 1;i > 1;i--) {
+		factorial = factorial * i;
+		
+	}
+	printf("%lu", factorial);
 
 	_getch();
+	return 0;
 }
 
 
