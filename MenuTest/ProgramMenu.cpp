@@ -3,8 +3,12 @@
 #include <conio.h>
 #include <stdio.h>
 #include <windows.h>
+#include <iostream>
+#include "Shlwapi.h"
 #include "ProgramMenu.h"
-
+#include <locale.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 CProgramMenu::CProgramMenu()
 {
@@ -13,6 +17,8 @@ CProgramMenu::CProgramMenu()
 	m_pMenuItems = NULL;
 	SetConsoleOutputCP(1250);
 	memset(m_pMainTitle, 0, 32);
+	setlocale(LC_CTYPE, "hu-HU");
+
 }
 
 CProgramMenu::~CProgramMenu(void)
@@ -215,4 +221,30 @@ int InputDouble(double* inputD)
 	}while (nc == 0);
 	*inputD = valD;
 	return nc;
+}
+
+
+
+
+
+// return 1 if the file exists, folder is full path specification (not relative!), setfile size and last modification date if pointers are not NULL
+int		FileExists(char* pFile, __int64* pSize /*NULL*/, __time64_t* pTimeMod /*NULL*/)
+{
+	int result;
+	struct _stat64 buffer;
+
+	if (strnlen(pFile, 4) < 3) return 0;
+	if (strnlen(pFile, _MAX_PATH) > _MAX_PATH - 1) return 0;
+	// if (PathFileExists(CA2CT(pFile)) != 1) return 0;
+	result = _stat64(pFile, &buffer);
+	if (result) {
+		result = errno;
+		return 0;
+	}
+	if (buffer.st_mode & _S_IFDIR) return 0;
+	else {
+		if (pSize) *pSize = buffer.st_size;
+		if (pTimeMod) *pTimeMod = buffer.st_mtime;
+		return 1;
+	}
 }
