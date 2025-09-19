@@ -225,8 +225,6 @@ int InputDouble(double* inputD)
 
 
 
-
-
 // return 1 if the file exists, folder is full path specification (not relative!), setfile size and last modification date if pointers are not NULL
 int		FileExists(char* pFile, __int64* pSize /*NULL*/, __int64* pTimeMod /*NULL*/)
 {
