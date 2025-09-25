@@ -32,9 +32,9 @@ void Factorial()
 
 int main()
 {
-	char str[32];
+	char str[32], ch;
 	double dbl;
-	int menuSelected = -1;
+	int result, menuSelected = -1;
 
 	system("cls");
 
@@ -44,6 +44,7 @@ int main()
 	mainMenu.AddMenuItem("Black on White");
 	mainMenu.AddMenuItem("White on Black");
 	mainMenu.AddMenuItem("Blue on Yellow");
+	mainMenu.AddMenuItem("String bevitel");
 	mainMenu.AddMenuItem("Kilépés", 0);
 
 	do {
@@ -57,6 +58,14 @@ int main()
 			break;
 		case 4: SetColor(1, 14);
 			break;
+		case 5: system("cls");
+				printf("\n\nString bevitel\n\n");
+				printf("Írjon be egy stringet: ");
+				result = InputStr(str, 32);
+				if (result > 0) printf("\nA beírt string: %s\n", str);
+				else printf("\nNem sikerült a beolvasás!\n");
+				ch = _getch();
+				break;
 		}
 
 	} while (menuSelected!=0);

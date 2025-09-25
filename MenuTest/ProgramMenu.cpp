@@ -138,6 +138,7 @@ int InputStr(char* str, int sizeStr, int options /*=0x10*/)
 
 	memset(pBuffer, 0, 256);
 	if ((sizeStr > 256) || (sizeStr < 1)) return -1;
+	str[0] = 0;
 	do {
 		ch = _getch();
 		chOK = 0;
