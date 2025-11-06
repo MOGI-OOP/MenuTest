@@ -1,11 +1,11 @@
 // MenuTest.cpp : This file contains the 'main' function. Program execution begins and ends there.
 //
 
-#include "ProgramMenu.h"
 #include <windows.h>
 #include <conio.h>
 #include <stdio.h>
-
+#include "_ProgramMenu.h"
+#include "_InputUtils.h"
 
 CProgramMenu mainMenu;
 
@@ -13,27 +13,21 @@ CProgramMenu mainMenu;
 void Factorial()
 {
 	int base;
+	__int64 fact=1;
 
 	system("cls");
 	printf("\n\nFaktoriális számítás\n\n");
-
 	printf("Írjon be egy egész számot: ");
 	InputInt(&base);
-
-
-	printf("Kovács Gábor\n");
-
-	// Készítse el a számítást és az eredmény kiírását
-
-
-	_getch();
+	for (int i = 2; i <= base; i++) fact *= i;
+	printf("\n\nFaktoriális: %lli ", fact);
+	int ch =_getch();
 }
 
 
 int main()
 {
 	char str[32], ch;
-	double dbl;
 	int result, menuSelected = -1;
 
 	system("cls");
