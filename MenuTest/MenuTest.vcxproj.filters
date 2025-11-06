@@ -18,12 +18,18 @@
     <ClCompile Include="MenuTest.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProgramMenu.cpp">
+    <ClCompile Include="_ProgramMenu.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="_InputUtils.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ProgramMenu.h">
+    <ClInclude Include="_ProgramMenu.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="_InputUtils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

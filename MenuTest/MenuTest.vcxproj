@@ -124,10 +124,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="MenuTest.cpp" />
-    <ClCompile Include="ProgramMenu.cpp" />
+    <ClCompile Include="_ProgramMenu.cpp" />
+    <ClCompile Include="_InputUtils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ProgramMenu.h" />
+    <ClInclude Include="_ProgramMenu.h" />
+    <ClInclude Include="_InputUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
