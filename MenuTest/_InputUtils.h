@@ -1,6 +1,10 @@
 #pragma once
 
 
+#define TIMECONV_UTC_UTC 1
+#define TIMECONV_UTC_LOCAL 0
+
+
 // Set Console cursor position
 void SetTerminalCursorPos(int x, int y);
 // Get Console cursor position
@@ -27,4 +31,29 @@ int		GetStringFieldDouble(char* pChOriginal, int nField, char separator, double*
 // return 1 if the file exists, folder is full path specification (not relative!), setfile size and last modification date if pointers are not NULL
 int		FileExists(char* pFile, __int64* pSize = nullptr /*NULL*/, __int64* pTimeMod = nullptr /*NULL*/);
 
+
+
+class CDateTime
+{
+public:
+	CDateTime();
+	~CDateTime();
+	int InitTime(long long timeVal, int ms=0);
+	void InitActualTime();
+
+	int LeapYear(int year);
+
+	int DaysPerMonth(int month, int year);
+
+	int ChkIsoTimeFormat(char* pIsoTime);
+	int PcTime2IsoStr(char* pTimeStr, int sizeChar, int format=1, int methode = TIMECONV_UTC_LOCAL);
+	int IsoStr2TimeUnits(char* pChar, int* pYear, int* pMonth, int* pDay, int* pHour, int* pMin, int* pSec, int* pMs);
+	int IsoStr2PcTime(char* pChar, int mode);
+
+
+
+	long long	m_unixTime;		// seconds since Jan 1 1970, 00:00:00
+	int			m_millisecs;
+
+};
 
