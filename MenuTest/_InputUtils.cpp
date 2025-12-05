@@ -2,8 +2,10 @@
 
 #include <conio.h>
 #include <stdio.h>
+#include < cstdio >
 #include <windows.h>
 #include <iostream>
+#include <time.h>
 #include "Shlwapi.h"
 #include <locale.h>
 #include <sys/types.h>
@@ -257,3 +259,269 @@ int		FileExists(char* pFile, __int64* pSize /*NULL*/, __int64* pTimeMod /*NULL*/
 		return 1;
 	}
 }
+
+
+
+
+
+
+CDateTime::CDateTime()
+{
+}
+
+
+CDateTime::~CDateTime()
+{
+}
+
+int CDateTime::InitTime(long long timeVal, int ms /*= 0 */)
+{
+	if (timeVal < -1) return -1;
+	if ((ms < 0) || (ms>999)) return -1;
+	if (timeVal == -1) InitActualTime();
+}
+
+
+void CDateTime::InitActualTime()
+{
+	_time64(&m_unixTime);
+	m_millisecs = 0;
+}
+
+//		return 1 if year is a leap year
+int CDateTime::LeapYear(int year)
+{
+	int ly = 0;
+
+	if (year < 0) return ly;
+	if (year % 4 == 0) {		// every 4. leap year
+		ly = 1;
+		if (year % 100 == 0) {  // every 100. not leapyear
+			ly = 0;
+			if (year % 400 == 0) ly = 1; // every 400. again leapyear
+		}
+	}
+	return ly;
+}
+
+//		returns the number of days in the month, or 0 on error. (January = 1)
+int CDateTime::DaysPerMonth(int month, int year)
+{
+	int ly = 0;
+	int dpm[14] = { 0, 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31, 9999 };
+
+	if ((year < 1) || (year > 5000)) return 0;
+	if ((month < 1) || (month > 12)) return 0;
+	if (LeapYear(year)) dpm[2] = 29;
+	return dpm[month];
+}
+
+
+
+// Checks ISO date time format return 0 on error, -1: on YYYY-DDD, 1: on YYYY-MM-DD, -2: on YYYY-DDDThh:mm:ss 2: on YYYY-MM-DDThh:mm:ss, -3: on YYYY-DDDThh:mm:ss.fff 3: on YYYY-MM-DDThh:mm:ss.fff
+int CDateTime::ChkIsoTimeFormat(char* pIsoTime)
+{
+	int i, len, fmt, nH;
+	//char *pTime;
+
+	len = (int)strnlen(pIsoTime, 32);
+	if ((len > 31) || (len < 8)) return 0;				// length too long or too short
+	for (i = 0; i < 4; i++) {
+		if (isdigit(pIsoTime[i]) == 0) return 0;		// year error
+	}
+	if (pIsoTime[4] != '-') return 0;					// year separator maust be a '-'
+	if ((isdigit(pIsoTime[5]) == 0) || (isdigit(pIsoTime[6]) == 0)) return 0;		// month or day error
+	if (len == 8) {							// YYYY-DDD
+		if (isdigit(pIsoTime[7]) == 0) return 0;
+		fmt = -1;
+		return fmt;
+	}
+	else {
+		if (len == 9) return 0;
+		if (len == 10) {					// YYYY-MM-DD
+			if ((pIsoTime[7] == '-') && isdigit(pIsoTime[8]) && isdigit(pIsoTime[9])) return 1;
+			else return 0;
+		}
+		if (pIsoTime[8] == 'T') {			// YYYY-DDDT...
+			fmt = -1;
+			if (isdigit(pIsoTime[7]) == 0) return 0;
+			nH = 9;
+		}
+		else {
+			if ((pIsoTime[7] != '-') || (isdigit(pIsoTime[8]) == 0) || (isdigit(pIsoTime[9]) == 0)) return 0;
+			fmt = 1;						// YYYY-MM-DDT...
+			nH = 11;
+		}
+	}
+	// YYYY-MM-DDThh:mm:ss
+	if ((pIsoTime[nH + 2] != ':') && (pIsoTime[nH + 2] != '.') && (pIsoTime[nH + 2] != '-')) return 0;		// check minute separator
+	if ((pIsoTime[nH + 5] != ':') && (pIsoTime[nH + 5] != '.') && (pIsoTime[nH + 5] != '-')) return 0;		// sec  separator
+	if (isdigit(pIsoTime[nH + 0]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 1]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 3]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 4]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 6]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 7]) == 0) return 0;
+	//  no fractonal seconds
+	if (pIsoTime[nH + 8] == 0) return 2 * fmt;
+	if (pIsoTime[nH + 9] == 0) {
+		if ((pIsoTime[nH + 8] == 'Z') || (pIsoTime[nH + 8] == 'z')) return 2 * fmt;
+		else return 0;
+	}
+	if (pIsoTime[nH + 8] != '.') return 0;
+	if (isdigit(pIsoTime[nH + 9]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 10]) == 0) return 0;
+	if (isdigit(pIsoTime[nH + 11]) == 0) return 0;
+	if (pIsoTime[nH + 12] == 0) return 3 * fmt;
+	if (pIsoTime[nH + 13] == 0) {
+		if ((pIsoTime[nH + 12] == 'Z') || (pIsoTime[nH + 12] == 'z')) return 3 * fmt;
+		else return 0;
+	}
+	if (isdigit(pIsoTime[nH + 12]) == 0) return 0;
+	if (pIsoTime[nH + 13] == 0) return 3 * fmt;
+	if (isdigit(pIsoTime[nH + 13]) == 0) return 0;
+	if (pIsoTime[nH + 14] == 0) return 3 * fmt;
+	if (isdigit(pIsoTime[nH + 14]) == 0) return 0;
+	if (pIsoTime[nH + 15] == 0) return 3 * fmt;
+	return 0;
+}
+
+
+int CDateTime::PcTime2IsoStr(char *pTimeStr, int sizeChar, int format /* = 1 */, int methode /* = TIMECONV_UTC_LOCAL */)
+{
+	int err;
+	struct tm   newTime;
+	char pTime[32];
+
+	if (m_unixTime < 0) return -1;
+	if (methode) err = _gmtime64_s(&newTime, &m_unixTime);		// TIMECONV_UTC_UTC  = 1
+	else err = _localtime64_s(&newTime, &m_unixTime);
+	if (err) return -3;
+	switch (format) {
+	case 0:	sprintf_s(pTime, 32, "%04d-%02d-%02d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday);
+		break;
+	case 1:	sprintf_s(pTime, 32, "%04d-%02d-%02dT%02d:%02d:%02d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+		break;
+	case 2:		sprintf_s(pTime, 32, "%04d-%02d-%02dT%02d:%02d:%02d.%03d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec, m_millisecs);
+		break;
+		// for filename: yymmddThhmmss
+	case 3:		sprintf_s(pTime, 32, "%02d%02d%02dT%02d%02d%02d", (newTime.tm_year + 1900) - 2000, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+		break;
+		// for filename: yymmddThhmmssfff
+	case 33:	sprintf_s(pTime, 32, "%02d%02d%02dT%02d%02d%02d%03d", (newTime.tm_year + 1900) - 2000, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec, m_millisecs);
+		break;
+	case 11:	sprintf_s(pTime, 32, "%02d:%02d:%02d", newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+		break;
+	case 12:	sprintf_s(pTime, 32, "%02d:%02d:%02d.%03d", newTime.tm_hour, newTime.tm_min, newTime.tm_sec, m_millisecs);
+		break;
+	case 101:	sprintf_s(pTime, 32, "%04d-%02d-%02dT%02d-%02d-%02d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+		break;
+	case 102:	sprintf_s(pTime, 32, "%04d-%02d-%02dT%02d-%02d-%02d.%03d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec, m_millisecs);
+		break;
+	default:	sprintf_s(pTime, 32, "%04d-%02d-%02dT%02d:%02d:%02d", newTime.tm_year + 1900, newTime.tm_mon + 1, newTime.tm_mday, newTime.tm_hour, newTime.tm_min, newTime.tm_sec);
+	}
+	return 0;
+}
+
+
+// Converts to ISO time string to PC __time64_t. Returns 0 on OK, optionally in pMs>0 returns milliseconds also, mode 0: use localtime, 1: UTC (no timezone and  daylight savings conversion)
+int CDateTime::IsoStr2PcTime(char* pChar, int mode /* = TIMECONV_UTC_LOCAL*/)
+{
+	struct tm   newTime;
+	int fmt, ye, mo, da, hr, mi, sec, ms;
+	__time64_t t0;
+
+	fmt = IsoStr2TimeUnits(pChar, &ye, &mo, &da, &hr, &mi, &sec, &ms);
+	if (fmt) return -2;
+	newTime.tm_year = ye - 1900;
+	newTime.tm_mon = mo - 1;
+	newTime.tm_mday = da;
+	newTime.tm_hour = hr;
+	newTime.tm_min = mi;
+	newTime.tm_sec = sec;
+	newTime.tm_isdst = 1;
+
+	if (mode) t0 = _mkgmtime64(&newTime);
+	else t0 = _mktime64(&newTime);
+	if (t0 < 0) return -101;
+
+	m_unixTime = t0;
+	m_millisecs = ms;
+	return 0;
+}
+
+
+// Converts ISO string to integers: year, month, day, hour, minute, sec, and milliseonds
+int CDateTime::IsoStr2TimeUnits(char* pChar, int* pYear, int* pMonth, int* pDay, int* pHour, int* pMin, int* pSec, int* pMs)
+{
+	int fmt, nc, len, cdx, repeat;
+	int cye = 0, cmo = 0, cda = 0, cdy = 0, chr = 0, cmi = 0, cse = 0, cms = 0;
+	char timeStr[32], * pTm;
+
+	fmt = ChkIsoTimeFormat(pChar);
+	if (fmt == 0) return -1;
+	memset(timeStr, 0, 32);
+	strncpy_s(timeStr, pChar, 31);
+	_strupr_s(timeStr);
+	len = (int)strnlen(timeStr, 63);
+	if (timeStr[len - 1] == 'Z') timeStr[len - 1] = 0;		// remove zulu 
+	// get year
+	timeStr[4] = 0;
+	nc = sscanf_s(timeStr, "%d", &cye);
+	if ((nc != 1) || (cye < 0) || (cye > 5000)) return -11;
+	if (LeapYear(cye)) cdx = 366;
+	else cdx = 365;
+	if (fmt > 0) {
+		timeStr[7] = 0;
+		timeStr[10] = 0;
+		nc = sscanf_s(timeStr + 5, "%d", &cmo);
+		if ((nc != 1) || (cmo < 1) || (cmo > 12)) return -12;
+		nc = sscanf_s(timeStr + 8, "%d", &cda);
+		if ((nc != 1) || (cda < 1) || (cda > DaysPerMonth(cmo, cye))) return -13;
+		pTm = timeStr + 11;
+	}
+	else {
+		timeStr[8] = 0;
+		nc = sscanf_s(timeStr + 5, "%d", &cdy);
+		if ((nc != 1) || (cdy < 1) || (cdy > cdx)) return -13;
+		cmo = 1;
+		if (cdy > DaysPerMonth(cmo, cye)) repeat = 1;
+		else repeat = 0;
+		while (repeat > 0) {
+			cdy -= DaysPerMonth(cmo, cye);
+			cmo++;
+			if (cdy <= DaysPerMonth(cmo, cye)) repeat = 0;
+			if (cmo > 12) repeat = -1;
+		}
+		if (repeat) return -12;
+		if (cdy > DaysPerMonth(cmo, cye)) return -13;
+		cda = cdy;
+		pTm = timeStr + 9;
+	}
+	if (abs(fmt) > 1) {
+		pTm[2] = 0;
+		pTm[5] = 0;
+		pTm[8] = 0;
+		nc = sscanf_s(pTm, "%d", &chr);
+		if ((nc != 1) || (chr < 0) || (chr > 23)) return -14;
+		nc = sscanf_s(pTm + 3, "%d", &cmi);
+		if ((nc != 1) || (cmi < 0) || (cmi > 59)) return -15;
+		nc = sscanf_s(pTm + 6, "%d", &cse);
+		if ((nc != 1) || (cse < 0) || (cse > 59)) return -16;
+		if (abs(fmt) > 2) {
+			*(pTm + 12) = 0;
+			nc = sscanf_s(pTm + 9, "%d", &cms);
+			if ((nc != 1) || (cms < 0) || (cms >= 1000)) return -17;
+		}
+	}
+	*pYear = cye;
+	*pMonth = cmo;
+	*pDay = cda;
+	if (pHour)	*pHour = chr;
+	if (pMin)	*pMin = cmi;
+	if (pSec)	*pSec = cse;
+	if (pMs)	*pMs = cms;
+	return 0;
+}
+
+

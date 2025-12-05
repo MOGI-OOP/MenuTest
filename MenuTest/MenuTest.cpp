@@ -53,7 +53,7 @@ int main()
 		case 4: SetColor(1, 14);
 			break;
 		case 5: system("cls");
-				printf("\n\nString bevitel\n\n");
+				printf("\n\nDátum string bevitel\n\n");
 				printf("Írjon be egy stringet: ");
 				result = InputStr(str, 32);
 				if (result > 0) printf("\nA beírt string: %s\n", str);
